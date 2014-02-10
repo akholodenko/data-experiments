@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en" ng-app="dataSearchApp">
+	<head>
+		<meta charset="utf-8">
+		<title>Google Phone Gallery</title>
+		<link rel="stylesheet" href="css/bootstrap.css">
+		<script type="application/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.12/angular.min.js"></script>
+		<script type="application/javascript" src="js/keypress.js"></script>
+		<script type="application/javascript" src="controllers/_controller.js"></script>
+		<script type="application/javascript" src="controllers/searchController.js"></script>
+	</head>
+	<body ng-controller="searchController">
+		<ul>
+			<li ng-repeat="phone in phones">
+				{{phone.name}}
+				<p>{{phone.snippet</p>
+			</li>
+		</ul>
+		<form novalidate>
+			Search: <input type="text" ng-model="keyword"  ui-keypress="{13:'submitSearch($event)'}"/>
+		</form>
+		<pre>keywords: {{keyword}}</pre>
+	</body>
+
+</html>

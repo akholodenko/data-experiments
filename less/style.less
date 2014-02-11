@@ -1,0 +1,39 @@
+@font-size-large: 18px;
+@font-size-normal: 13px;
+
+.cell-padding {
+  padding: 10px;
+}
+
+form.search {
+  .cell-padding;
+  input {
+    width: 400px;
+  }
+}
+
+.category-counts {
+  max-height: 200px;
+  overflow-y: scroll;
+  padding: 0px 25px;
+  border-bottom: 1px solid #999999;
+  .category-count {
+    font-size: @font-size-large;
+  }
+}
+
+.results {
+  border-bottom: 1px solid #cccccc;
+  .title a {
+    font-size: @font-size-large;
+    font-weight: 500;
+    float: left;
+    width: 35%;
+    .cell-padding;
+  }
+  .categories {
+    font-size: @font-size-normal;
+    margin-left: 35%;
+    .cell-padding;
+  }
+}

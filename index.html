@@ -2,22 +2,30 @@
 <html lang="en" ng-app="dataSearchApp">
 	<head>
 		<meta charset="utf-8">
-		<title>Google Phone Gallery</title>
-		<link rel="stylesheet" href="css/bootstrap.css">
+		<title>Wiki-search</title>
+		<link rel="stylesheet" href="css/bootstrap.min.css" />
+		<link rel="stylesheet" href="css/style.css" />
 		<script type="application/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.12/angular.min.js"></script>
 		<script type="application/javascript" src="js/keypress.js"></script>
 		<script type="application/javascript" src="controllers/_controller.js"></script>
 		<script type="application/javascript" src="controllers/searchController.js"></script>
 	</head>
 	<body ng-controller="searchController">
-		<form novalidate>
-			Search: <input type="text" ng-model="keyword"  ui-keypress="{13:'submitSearch($event)'}"/>
+		<form novalidate class="search">
+			Search: <input type="text" class="form-control" ng-model="keyword"  ui-keypress="{13:'submitSearch($event)'}"/>
 		</form>
-		<pre>keywords: {{keyword}}</pre>
+		<pre>keywords: {{keyword}} {{searchState}}</pre>
 		<pre>total results: {{searchResultCount}}</pre>
-		<div ng-repeat="searchResult in searchResults">
-			{{searchResult.title}} {{searchResult.categories}}
-			<hr/>
+		<div class="category-counts">
+			<div class="category-count" ng-repeat="categoryCount in searchResultCategoryCounts | orderBy:'count':true">
+				{{categoryCount.title}}: {{categoryCount.count}}
+			</div>
+		</div>
+		<div class="results" ng-repeat="searchResult in searchResults">
+			<div class="title"><a target="_blank" href="{{searchResult.wikiUrl}}">{{searchResult.title}}</a></div>
+			<div class="categories" ng-repeat="category in searchResult.categories">
+				{{category.title}}
+			</div>
 		</div>
 	</body>
 

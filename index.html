@@ -15,7 +15,7 @@
 			Search: <input type="text" class="form-control" ng-model="keyword"  ui-keypress="{13:'submitSearch($event)'}"/>
 		</form>
 		<pre>keywords: {{keyword}} {{searchState}}</pre>
-		<pre>total results: {{searchResultCount}}</pre>
+		<pre>total results: {{searchResultCount}} (50 max. shown)</pre>
 		<div class="category-counts">
 			<div class="category-count" ng-repeat="categoryCount in searchResultCategoryCounts | orderBy:'count':true">
 				{{categoryCount.title}}: {{categoryCount.count}}

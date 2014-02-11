@@ -9,7 +9,7 @@ dataSearchApp.controller('searchController', ['$scope', '$http', function ($scop
 			$scope.searchResults = [];
 			$scope.searchResultCategoryCounts = [];	// clear category counts before search
 
-			$http.jsonp('http://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=intitle:' + encodeURIComponent(this.keyword)+ '&format=json&limit=50&callback=JSON_CALLBACK').
+			$http.jsonp('http://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=intitle:' + encodeURIComponent(this.keyword)+ '&format=json&srlimit=50&callback=JSON_CALLBACK').
 				success(function(data, status, headers, config) {
 					if(data.query !== undefined) {
 						$scope.searchResultCount = data.query.searchinfo.totalhits;

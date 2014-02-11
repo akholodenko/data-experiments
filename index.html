@@ -10,16 +10,15 @@
 		<script type="application/javascript" src="controllers/searchController.js"></script>
 	</head>
 	<body ng-controller="searchController">
-		<ul>
-			<li ng-repeat="phone in phones">
-				{{phone.name}}
-				<p>{{phone.snippet</p>
-			</li>
-		</ul>
 		<form novalidate>
 			Search: <input type="text" ng-model="keyword"  ui-keypress="{13:'submitSearch($event)'}"/>
 		</form>
 		<pre>keywords: {{keyword}}</pre>
+		<pre>total results: {{searchResultCount}}</pre>
+		<div ng-repeat="searchResult in searchResults">
+			{{searchResult.title}} {{searchResult.categories}}
+			<hr/>
+		</div>
 	</body>
 
 </html>

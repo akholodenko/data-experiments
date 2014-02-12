@@ -13,6 +13,7 @@
 	<body ng-controller="searchController">
 		<form novalidate class="search">
 			Search: <input type="text" class="form-control" ng-model="keyword"  ui-keypress="{13:'submitSearch($event)'}"/>
+			<label>title search only</label> <input type="checkbox" ng-model="titleSearchOnly" />
 		</form>
 		<pre>keywords: {{keyword}} {{searchState}}</pre>
 		<pre>total results: {{searchResultCount}} (50 max. shown)</pre>

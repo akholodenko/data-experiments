@@ -1,12 +1,65 @@
 dataSearchApp.controller('searchController', ['$scope', '$http', function ($scope, $http) {
+	$scope.keyword = '';
 	$scope.searchResults = [];
 	$scope.searchResultCount = 0;
 	$scope.searchResultCategoryCounts = [];
 	$scope.titleSearchOnly = true;
+	$scope.searchSource = 'wiki';
 
 	$scope.submitSearch = function($event) {
-		if(this.keyword.length) {
-			$scope.searchState = 'Loading...';
+		switch($scope.searchSource) {
+			case 'wiki':
+				$scope.submitWikiSearch($event);
+				break;
+			case 'fbase':
+				$scope.submitFBaseSearch($event);
+				break;
+		}
+	};
+
+	// submit search via freebase
+	$scope.submitFBaseSearch = function($event) {
+		if($scope.keyword.length) {
+			$scope.searchState = 'Searching Freebase...';
+			$scope.searchResults = [];
+			$scope.searchResultCategoryCounts = [];	// clear category counts before search
+
+			$http.jsonp('https://www.googleapis.com/freebase/v1/search?query=' + encodeURIComponent(this.keyword) + '&callback=JSON_CALLBACK').
+				success(function(data, status, headers, config) {
+					if(data.status ='200 OK' && data.result !== undefined) {
+						$scope.searchResultCount = data.hits;
+
+						data.result.forEach(function (item) {
+							var result = new Object();
+							result.title = item.name;
+							result.wikiUrl = 'http://www.freebase.com' + item.mid;
+
+							$scope.searchResults.push(result);
+						});
+
+						$scope.searchState = '';
+					}
+					// error handling for bad response
+					else {
+						$scope.searchResultCount = 0;
+						$scope.searchState = 'Bad response';
+						$scope.searchResults = [];
+					}
+				}).
+				error(function(data, status, headers, config) {
+					console.log('problem calling Freebase API');
+				}
+			);
+		}
+
+		if($event != null)
+			$event.preventDefault();
+	};
+
+	// submit search via wikipedia
+	$scope.submitWikiSearch = function($event) {
+		if($scope.keyword.length) {
+			$scope.searchState = 'Searching Wikipedia...';
 			$scope.searchResults = [];
 			$scope.searchResultCategoryCounts = [];	// clear category counts before search
 
@@ -40,59 +93,69 @@ dataSearchApp.controller('searchController', ['$scope', '$http', function ($scop
 			$event.preventDefault();
 	};
 
-	$scope.$watch('titleSearchOnly', function (newValue, oldvValue) {
-		if(oldvValue == newValue) {
-			return;
-		}
-		else {
-			console.log('chnaged' + newValue + ' ' + oldvValue);
-			$scope.submitSearch(null);
-		}
-	});
+	$scope.$watch('[titleSearchOnly,searchSource]', function (newValue, oldvValue) {
+		if(oldvValue == newValue) return;
+		else $scope.submitSearch(null);
+	}, true);
 
 	// listen to change in search results and get wikipedia pages for new items
 	$scope.$watch('searchResults', function (newValue, oldvValue) {
 		// because watch fires upon init, need to make sure the trigger is legit for change in value
-		if(oldvValue.length == newValue.length) {
-			return;
-		}
+		if(oldvValue.length == newValue.length) return;
 		else {
-			$scope.searchResults.forEach(function(item) {
-				$http.jsonp('http://en.wikipedia.org/w/api.php?action=query&titles=' + encodeURIComponent(item.title) + '&prop=categories&format=json&callback=JSON_CALLBACK').
-					success(function(data, status, headers, config) {
-						var pageId = Object.keys(data.query.pages)[0];
-
-						//console.log(data.query.pages[pageId].categories);
-						if(data.query.pages[pageId].categories !== undefined) {
-							item.categories = data.query.pages[pageId].categories;
-
-							for (var i = item.categories.length - 1; i >= 0; i--) {
-								item.categories[i].title = item.categories[i].title.replace('Category:','');
-
-								var found = false;
-								$scope.searchResultCategoryCounts.forEach(function(setCategory) {
-									if(setCategory.title == item.categories[i].title) {
-										setCategory.count++;
-										found = true;
-										return;
-									}
-								});
-
-								if(!found) {
-									//console.log('first time: ' + item.categories[i].title);
-									var category = new Object();
-									category.title = item.categories[i].title;
-									category.count = 1;
-									$scope.searchResultCategoryCounts.push(category);
-								 }
-							}
-						}
-					}).
-					error(function(data, status, headers, config) {
-						console.log('problem calling Wikipedia API (page resolution)');
-					}
-				);
-			});
+			switch($scope.searchSource) {
+				case 'wiki':
+					$scope.getWikiCategoryDetails();
+					break;
+				case 'fbase':
+					$scope.getFBaseCategoryDetails();
+					break;
+			}
 		}
 	}, true);
+
+	// look up categories of specific search results from freebase
+	$scope.getFBaseCategoryDetails = function () {
+		console.log('get freebase category details tbd');
+	};
+
+	// look up categories of specific search results from wikipedia
+	$scope.getWikiCategoryDetails = function () {
+		$scope.searchResults.forEach(function(item) {
+			$http.jsonp('http://en.wikipedia.org/w/api.php?action=query&titles=' + encodeURIComponent(item.title) + '&prop=categories&format=json&callback=JSON_CALLBACK').
+				success(function(data, status, headers, config) {
+					var pageId = Object.keys(data.query.pages)[0];
+
+					//console.log(data.query.pages[pageId].categories);
+					if(data.query.pages[pageId].categories !== undefined) {
+						item.categories = data.query.pages[pageId].categories;
+
+						for (var i = item.categories.length - 1; i >= 0; i--) {
+							item.categories[i].title = item.categories[i].title.replace('Category:','');
+
+							var found = false;
+							$scope.searchResultCategoryCounts.forEach(function(setCategory) {
+								if(setCategory.title == item.categories[i].title) {
+									setCategory.count++;
+									found = true;
+									return;
+								}
+							});
+
+							if(!found) {
+								//console.log('first time: ' + item.categories[i].title);
+								var category = new Object();
+								category.title = item.categories[i].title;
+								category.count = 1;
+								$scope.searchResultCategoryCounts.push(category);
+							}
+						}
+					}
+				}).
+				error(function(data, status, headers, config) {
+					console.log('problem calling Wikipedia API (page resolution)');
+				}
+			);
+		});
+	};
 }]);

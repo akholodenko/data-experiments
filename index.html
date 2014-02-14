@@ -14,6 +14,8 @@
 		<form novalidate class="search">
 			Search: <input type="text" class="form-control" ng-model="keyword"  ui-keypress="{13:'submitSearch($event)'}"/>
 			<label>title search only</label> <input type="checkbox" ng-model="titleSearchOnly" />
+			<label>Wikipedia</label> <input type="radio" ng-model="searchSource" value="wiki" />
+			<label>Freebase</label> <input type="radio" ng-model="searchSource" value="fbase" />
 		</form>
 		<pre>keywords: {{keyword}} {{searchState}}</pre>
 		<pre>total results: {{searchResultCount}} (50 max. shown)</pre>

@@ -33,6 +33,7 @@ dataSearchApp.controller('searchController', ['$scope', '$http', function ($scop
 							var result = new Object();
 							result.title = item.name;
 							result.wikiUrl = 'http://www.freebase.com' + item.mid;
+							result.mid = item.mid;
 
 							$scope.searchResults.push(result);
 						});
@@ -117,6 +118,46 @@ dataSearchApp.controller('searchController', ['$scope', '$http', function ($scop
 	// look up categories of specific search results from freebase
 	$scope.getFBaseCategoryDetails = function () {
 		console.log('get freebase category details tbd');
+
+		$scope.searchResults.forEach(function(item) {
+			$http.jsonp('https://www.googleapis.com/freebase/v1/topic' + item.mid + '?callback=JSON_CALLBACK').
+				success(function(data, status, headers, config) {
+					console.log('https://www.googleapis.com/freebase/v1/topic' + item.mid);
+					console.log(data.property);
+					//if(data.property['/type/object/type'].values.text !== undefined)
+					//	console.log(data.property['/type/object/type'].values.text);
+					/*
+					if(data.query.pages[pageId].categories !== undefined) {
+						item.categories = data.query.pages[pageId].categories;
+
+						for (var i = item.categories.length - 1; i >= 0; i--) {
+							item.categories[i].title = item.categories[i].title.replace('Category:','');
+
+							var found = false;
+							$scope.searchResultCategoryCounts.forEach(function(setCategory) {
+								if(setCategory.title == item.categories[i].title) {
+									setCategory.count++;
+									found = true;
+									return;
+								}
+							});
+
+							if(!found) {
+								//console.log('first time: ' + item.categories[i].title);
+								var category = new Object();
+								category.title = item.categories[i].title;
+								category.count = 1;
+								$scope.searchResultCategoryCounts.push(category);
+							}
+						}
+					}
+					*/
+				}).
+				error(function(data, status, headers, config) {
+					console.log('problem calling Freebase API (page resolution)');
+				}
+			);
+		});
 	};
 
 	// look up categories of specific search results from wikipedia
